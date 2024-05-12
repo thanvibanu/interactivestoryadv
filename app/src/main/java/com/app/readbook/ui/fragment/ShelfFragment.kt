@@ -23,7 +23,12 @@ class ShelfFragment : BaseVBFragment<FragmentShelfBinding>() {
                 return ItemMenuBinding.inflate(layoutInflater, parent, false)
             }
 
-            override fun bind(item: ItemMenuBinding, data: Book, position: Int) {
+            override fun bind(
+                item: ItemMenuBinding,
+                data: Book,
+                position: Int,
+                dataList: List<Book>
+            ) {
                 item.title.text = data.title
                 item.root.setOnClickListener { v: View? ->
                     startActivity(

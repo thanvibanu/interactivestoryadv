@@ -23,4 +23,6 @@ class Chapter : java.io.Serializable {
 
     var addTime: Long = 0
 
+    var linkedChapters : List<String> = emptyList()
+
 }

@@ -33,11 +33,11 @@
             android:id="@+id/tv_ip"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerInParent="true"
             android:gravity="center"
             android:paddingHorizontal="10dp"
-            android:text="Upload"
+            android:text="@string/new_story"
             android:textColor="#fff"
             android:textSize="14sp" />
     </RelativeLayout>
@@ -52,13 +52,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Please enter a search" />
+            android:hint="@string/ssearch" />
 
         <TextView
             android:id="@+id/tv_starch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search"
+            android:text="@string/ssearch"
             android:textColor="@color/colorPrimary" />
     </LinearLayout>
     <com.google.android.material.tabs.TabLayout

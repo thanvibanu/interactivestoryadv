@@ -12,5 +12,14 @@
     </string-array>
 
     <string name="choose_gender">Choose gender</string>
+    <string name="coverImage">Image:</string>
+    <string name="bookName">Please enter the book name</string>
+    <string name="bookNameLabel">Name:</string>
+    <string name="editBookLabel">Edit Book</string>
+    <string name="plus">+</string>
+    <string name="selectChapters">Select linked chapters</string>
+    <string name="open_from">Open From:</string>
+    <string name="new_story">New Story</string>
+    <string name="ssearch">Search</string>
 
 </resources>

@@ -13,10 +13,10 @@ abstract class BindAdapter<VB : ViewBinding, Data> : RecyclerView.Adapter<BindHo
     abstract fun createHolder(parent: ViewGroup?): VB
     override fun onBindViewHolder(holder: BindHolder<VB>, position: Int) {
         val d = data[position]
-        bind(holder.vb, d, position)
+        bind(holder.vb, d, position, data)
     }
 
-    abstract fun bind(vb: VB, data: Data, position: Int)
+    abstract fun bind(vb: VB, data: Data, position: Int, dataList: List<Data>)
     override fun getItemCount(): Int {
         return data.size
     }

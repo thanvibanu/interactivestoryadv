@@ -1,7 +1,11 @@
 package com.app.readbook.ui.activity
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import com.app.readbook.App
@@ -13,7 +17,12 @@ import com.app.readbook.data.Chapter
 import com.app.readbook.data.Collect
 import com.app.readbook.data.Follow
 import com.app.readbook.databinding.ActivityBookDetailBinding
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.storage
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import java.io.IOException
 
 class BookDetailActivity : BaseVBActivity<ActivityBookDetailBinding>() {
     private val adapter: ChapterAdapter by lazy {
@@ -41,6 +50,18 @@ class BookDetailActivity : BaseVBActivity<ActivityBookDetailBinding>() {
             toast("Please login first")
             startActivity(Intent(this, LoginActivity::class.java))
         }
+            runBlocking {
+                if(book.getImageBitmap() != null) {
+                    binding.imageView.setImageBitmap(book.getImageBitmap())
+                }
+                else if(book.getImgUri() != null){
+                    loadBitmapFromUri(binding.root.context,book.getImgUri()) { bitmap ->
+                        // Set the bitmap to the ImageView when it's loaded
+                        book.setImage_(bitmap as Bitmap)
+                        binding.imageView.setImageBitmap(bitmap as Bitmap?)
+                    }
+                }
+            }
         binding.rvChapter.adapter = adapter
         if (book.writerId == user?.id) {
             binding.tvCollect.visibility = View.GONE
@@ -135,6 +156,24 @@ class BookDetailActivity : BaseVBActivity<ActivityBookDetailBinding>() {
             }
 
         }
+    }
+
+    suspend fun loadBitmapFromUri(context: Context, uri: Uri?, param: (Any) -> Unit): Unit? {
+
+        if (uri.toString() != "null" && uri != null) {
+            return try {
+                val storageRef = Firebase.storage.getReferenceFromUrl(uri.toString())
+                val MAX_SIZE_BYTES: Long = 1024 * 1024 // 1MB max
+                val imageBytes = storageRef.getBytes(MAX_SIZE_BYTES).await()
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                param(bitmap)
+            } catch (e: IOException) {
+                e.printStackTrace()
+                null
+            }
+
+        }
+        return null
     }
 
     override fun onResume() {

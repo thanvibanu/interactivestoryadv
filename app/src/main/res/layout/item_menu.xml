@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:text="标题"
+            android:text="Item n"
             android:textColor="@color/black"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -41,6 +41,6 @@
         android:background="@color/colorPrimary"
         android:paddingHorizontal="10dp"
         android:paddingVertical="10dp"
-        android:text="Start reading"
+        android:text="Read"
         android:textColor="@color/white" />
 </LinearLayout>

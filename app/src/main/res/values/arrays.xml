@@ -11,4 +11,8 @@
         <item>Female</item>
         <item>Other</item>
     </string-array>
+
+    <string-array name="chapter_list">
+        <item>Select a chapter</item>
+    </string-array>
 </resources>

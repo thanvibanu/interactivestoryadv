@@ -16,23 +16,23 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:padding="10dp"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/coverImage" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:text="Edit Book"
+            android:text="@string/editBookLabel"
             android:textColor="#fff"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
     </RelativeLayout>
 
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="30dp"
         android:background="#f6f6f6" />
 
     <LinearLayout
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="Name:"
+            android:text="@string/bookNameLabel"
             android:textColor="@color/colorPrimary" />
 
         <EditText
@@ -52,12 +52,48 @@
             android:layout_height="50dp"
             android:layout_weight="1"
             android:background="#00000000"
-            android:hint="Please enter the book name"
+            android:hint="@string/bookName"
             android:paddingHorizontal="10dp"
             android:textColor="@color/colorPrimary"
             android:textColorHint="@color/colorPrimary"
-            android:textSize="14dp" />
+            android:textSize="14sp" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#f6f6f6" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="15dp">
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="@string/coverImage"
+            android:textColor="@color/colorPrimary" />
+
+            <ImageView
+                android:id="@+id/cover_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/coverImage" />
+
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:contentDescription="@string/coverImage"
+                android:src="@android:drawable/ic_input_add"
+                android:focusable="true"
+                android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
 
     <View
         android:layout_width="match_parent"
@@ -88,7 +124,6 @@
             android:textColorHint="@color/colorPrimary"
             android:textSize="14dp" />
     </LinearLayout>
-
 
     <View
         android:layout_width="match_parent"
@@ -145,8 +180,8 @@
             android:layout_gravity="center"
             android:layout_marginHorizontal="15dp"
             android:layout_weight="1"
-            android:gravity="center"
             android:background="@color/colorPrimary"
+            android:gravity="center"
             android:text="Save"
             android:textColor="@color/white" />
 
@@ -157,8 +192,8 @@
             android:layout_gravity="center"
             android:layout_marginHorizontal="15dp"
             android:layout_weight="1"
-            android:gravity="center"
             android:background="@color/colorPrimary"
+            android:gravity="center"
             android:text="Cancel"
             android:textColor="@color/white" />
     </LinearLayout>

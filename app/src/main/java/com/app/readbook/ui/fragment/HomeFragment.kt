@@ -2,7 +2,11 @@ package com.app.readbook.ui.fragment
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import com.app.readbook.App
@@ -18,7 +22,12 @@ import com.app.readbook.ui.activity.BookDetailActivity
 import com.app.readbook.ui.activity.LoginActivity
 import com.app.readbook.ui.activity.ReadActivity
 import com.google.android.material.tabs.TabLayout
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.storage
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import java.io.IOException
 
 
 class HomeFragment : BaseVBFragment<FragmentHomeBinding>() {
@@ -29,8 +38,26 @@ class HomeFragment : BaseVBFragment<FragmentHomeBinding>() {
             }
 
             @SuppressLint("SetTextI18n")
-            override fun bind(item: ItemMenuBinding, data: Book, position: Int) {
+            override fun bind(
+                item: ItemMenuBinding,
+                data: Book,
+                position: Int,
+                dataList: List<Book>
+            ) {
                 item.title.text = data.title
+                runBlocking {
+                    if(data.getImageBitmap() != null) {
+                        item.img.setImageBitmap(data.getImageBitmap())
+                    }
+                    else {
+                        loadBitmapFromUri(binding.root.context,data.getImgUri()) { bitmap ->
+                            // Set the bitmap to the ImageView when it's loaded
+                            data.setImage_(bitmap as Bitmap)
+                            item.img.setImageBitmap(bitmap as Bitmap?)
+                        }
+                    }
+                }
+
                 item.root.setOnClickListener { v: View? ->
                     startActivity(
                         Intent(
@@ -73,7 +100,8 @@ class HomeFragment : BaseVBFragment<FragmentHomeBinding>() {
                 }
             }
         }
-    private val starch: ArrayList<Book> = ArrayList()
+
+    private val search: ArrayList<Book> = ArrayList()
 
     override fun initView() {
         if (App.user == null) {
@@ -95,11 +123,11 @@ class HomeFragment : BaseVBFragment<FragmentHomeBinding>() {
             val text = binding.etSearch.text.toString();
             if (text.isEmpty()) {
                 adapter.data.clear()
-                adapter.data.addAll(starch)
+                adapter.data.addAll(search)
                 adapter.notifyDataSetChanged()
             } else {
                 adapter.data.clear()
-                for (book in starch) {
+                for (book in search) {
                     if (book.title.contains(text) || book.writerName.contains(text)) {
                         adapter.data.add(book)
                     }
@@ -113,19 +141,78 @@ class HomeFragment : BaseVBFragment<FragmentHomeBinding>() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun refresh() {
-        FirebaseFirestore.getInstance().collection("Book").apply {
+//        FirebaseFirestore.getInstance().collection("Book").apply {
             if (App.user?.type == "Writer") {
-                whereEqualTo("email", App.user?.email)
+                FirebaseFirestore.getInstance().collection("Book").
+                whereEqualTo("email", App.user?.email).
+                whereEqualTo("type", type2).get()
+                    .addOnSuccessListener { queryDocumentSnapshots ->
+                        adapter.data.clear()
+                        queryDocumentSnapshots.forEach{
+                            val book = Book()
+                            book.id = it["id"].toString()
+                            book.title = it["title"].toString()
+                            book.content = it["content"].toString()
+                            book.email = it["email"].toString()
+                            book.type = it["type"].toString()
+                            book.setImgUri_(Uri.parse(it["imgUri"].toString()))
+                            book.writerId = it["writerId"].toString()
+                            book.addTime = it["addTime"].toString().toLong()
+                            book.readCount = it["readCount"].toString().toInt()
+                            book.writerName = it["writerName"].toString()
+                            adapter.data.add(book)
+                        }
+                        search.clear()
+                        search.addAll(adapter.data)
+                        adapter.notifyDataSetChanged()
+                        binding.rvWorks.adapter = adapter
+                    }.addOnFailureListener { }
+            } else {
+                FirebaseFirestore.getInstance().collection("Book").
+                whereEqualTo("type", type2).get()
+                    .addOnSuccessListener { queryDocumentSnapshots ->
+                        adapter.data.clear()
+                        queryDocumentSnapshots.forEach{
+                            val book = Book()
+                            book.id = it["id"].toString()
+                            book.title = it["title"].toString()
+                            book.content = it["content"].toString()
+                            book.email = it["email"].toString()
+                            book.type = it["type"].toString()
+                            book.setImgUri_(Uri.parse(it["imgUri"].toString()))
+                            book.writerId = it["writerId"].toString()
+                            book.addTime = it["addTime"].toString().toLong()
+                            book.readCount = it["readCount"].toString().toInt()
+                            book.writerName = it["writerName"].toString()
+                            adapter.data.add(book)
+                        }
+                        search.clear()
+                        search.addAll(adapter.data)
+                        adapter.notifyDataSetChanged()
+                        binding.rvWorks.adapter = adapter
+                    }.addOnFailureListener { }
             }
-        }.whereEqualTo("type", type2).get()
-            .addOnSuccessListener { queryDocumentSnapshots ->
-                adapter.data.clear()
-                adapter.data.addAll(queryDocumentSnapshots.toObjects(Book::class.java))
-                starch.clear()
-                starch.addAll(queryDocumentSnapshots.toObjects(Book::class.java))
-                adapter.notifyDataSetChanged()
-            }.addOnFailureListener { }
 
+
+    }
+
+
+     suspend fun loadBitmapFromUri(context: Context, uri: Uri?, param: (Any) -> Unit): Unit? {
+
+         if (uri.toString() != "null" && uri != null) {
+             return try {
+                 val storageRef = Firebase.storage.getReferenceFromUrl(uri.toString())
+                 val MAX_SIZE_BYTES: Long = 10 * 1024 * 1024 // 1MB max
+                 val imageBytes = storageRef.getBytes(MAX_SIZE_BYTES).await()
+                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                 param(bitmap)
+             } catch (e: IOException) {
+                 e.printStackTrace()
+                 null
+             }
+
+         }
+         return null
     }
 
     override fun initData() {

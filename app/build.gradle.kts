@@ -59,10 +59,18 @@ dependencies {
 
     implementation("com.google.firebase:firebase-analytics")
     // Firestore
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.firebase:firebase-firestore")
 
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+
     // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth")
+    //implementation("com.google.firebase:firebase-auth")
+
+    //storage
+    implementation("com.google.firebase:firebase-storage")
 
     // Google Play services
     implementation("com.google.android.gms:play-services-auth:21.1.1")

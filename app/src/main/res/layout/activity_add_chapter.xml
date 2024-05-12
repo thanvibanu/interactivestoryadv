@@ -95,13 +95,19 @@
         <TextView
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="Open to:"
+            android:text="@string/open_from"
             android:textColor="@color/colorPrimary" />
 
-        <EditText
-            android:id="@+id/ed_open_to"
+        <Spinner
+            android:id="@+id/spinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:entries="@array/chapter_list"
+            android:prompt="@string/selectChapters" />
+
+
+
     </LinearLayout>
 
     <View

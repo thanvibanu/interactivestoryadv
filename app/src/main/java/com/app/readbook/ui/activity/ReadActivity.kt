@@ -1,6 +1,7 @@
 package com.app.readbook.ui.activity
 
 import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -12,13 +13,17 @@ import com.app.readbook.data.Book
 import com.app.readbook.data.Chapter
 import com.app.readbook.databinding.ActivityReadBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.DelicateCoroutinesApi
+import java.io.ByteArrayInputStream
+import java.io.ObjectInputStream
 
 class ReadActivity : BaseVBActivity<ActivityReadBinding>() {
 
     private val sharedPreferences: SharedPreferences by lazy {
         getSharedPreferences("chapter", AppCompatActivity.MODE_PRIVATE)
     }
-    private lateinit var chapter: List<Chapter>
+    private lateinit var chapters: List<Chapter>
+
     private var position: Int = -1
     private val readAdapter: ReadAdapter by lazy {
         ReadAdapter({
@@ -30,26 +35,42 @@ class ReadActivity : BaseVBActivity<ActivityReadBinding>() {
         }, {
             if (binding.tvDetail.visibility == View.GONE) {
                 binding.tvDetail.visibility = View.VISIBLE
-            }else{
+            } else {
                 binding.tvDetail.visibility = View.GONE
             }
         })
     }
     private var hideCount = 0
     private var needCount = 0
+    @OptIn(DelicateCoroutinesApi::class)
     override fun initData() {
-        chapter = intent.getSerializableExtra("chapterList") as List<Chapter>
-        setNeedHideInfo(chapter)
+        try {
+            chapters = intent.getSerializableExtra("chapterList") as List<Chapter>
+        }catch(e : Exception) {
+            chapters = deserializeList(intent.getByteArrayExtra("chapterList"))
+        }
+        setNeedHideInfo(chapters)
         position = intent.getIntExtra("position", sharedPreferences.getInt("position", 0))
-        if (!chapter.isNullOrEmpty()) {
+        if (!chapters.isNullOrEmpty()) {
             // 增加阅读次数
-            FirebaseFirestore.getInstance().collection("Book").document(chapter[position].bookId)
+            FirebaseFirestore.getInstance().collection("Book").document(chapters[position].bookId)
                 .get().addOnSuccessListener { it ->
-                    val book = it.toObject(Book::class.java)
-                    book?.let { bookNotNull ->
+                    val book = Book()
+                    book.id = it["id"].toString()
+                    book.title = it["title"].toString()
+                    book.content = it["content"].toString()
+                    book.email = it["email"].toString()
+                    book.type = it["type"].toString()
+                    book.setImgUri_(Uri.parse(it["imgUri"].toString()))
+                    book.writerId = it["writerId"].toString()
+                    book.addTime = it["addTime"].toString().toLong()
+                    book.readCount = it["readCount"].toString().toInt()
+                    book.writerName = it["writerName"].toString()
+
+                    book.let { bookNotNull ->
                         bookNotNull.readCount++
                         FirebaseFirestore.getInstance().collection("Book")
-                            .document(chapter[position].bookId).set(bookNotNull)
+                            .document(chapters[position].bookId).set(bookNotNull)
                     }
                 }
         }
@@ -74,7 +95,7 @@ class ReadActivity : BaseVBActivity<ActivityReadBinding>() {
                 super.onPageSelected(position)
                 Log.e("ReadActivity", "onPageSelected: $position")
                 this@ReadActivity.position = position
-                if (position == needCount && newList.size < chapter.size) {
+                if (position == needCount && newList.size < chapters.size) {
                     newList.add(chapterItem)
                     newList.sortBy { it.addTime }
                     readAdapter.data.clear()
@@ -112,5 +133,15 @@ class ReadActivity : BaseVBActivity<ActivityReadBinding>() {
             }
         }
         newList.sortBy { it.addTime } // 按照 addTime 排序 newList
+    }
+
+    private fun deserializeList(serializedList: ByteArray?): List<Chapter> {
+        if (serializedList == null) return emptyList()
+        val byteArrayInputStream = ByteArrayInputStream(serializedList)
+        val objectInputStream = ObjectInputStream(byteArrayInputStream)
+        @Suppress("UNCHECKED_CAST")
+        val list = objectInputStream.readObject() as? List<Chapter>
+        objectInputStream.close()
+        return list ?: emptyList()
     }
 }

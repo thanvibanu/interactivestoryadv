@@ -1,12 +1,22 @@
 package com.app.readbook.data
 
-import com.google.firebase.firestore.DocumentId
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import java.io.ByteArrayOutputStream
 
 class Book : java.io.Serializable {
     @JvmField
 
     var id: String = ""
+    @JvmField
+    var image : Bitmap? = null
 
+    var imageByteArray: ByteArray? = null
+
+    @JvmField
+    var imgUri : Uri? = null
+    var imgUriString: String? = null
 
     @JvmField
     var title: String = ""
@@ -35,5 +45,23 @@ class Book : java.io.Serializable {
     override fun hashCode(): Int {
         return id.hashCode()
     }
+
+    fun setImage_(bitmap: Bitmap) {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        imageByteArray = stream.toByteArray()
+    }
+    fun getImageBitmap(): Bitmap? {
+        return imageByteArray?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+    }
+
+    fun setImgUri_(uri: Uri) {
+        imgUriString = uri.toString()
+    }
+
+    fun getImgUri(): Uri? {
+        return imgUriString?.let { Uri.parse(it) }
+    }
+
 
 }

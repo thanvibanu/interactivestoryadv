@@ -12,24 +12,43 @@
         <TextView
             android:id="@+id/tv_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="#252525"
             android:lineSpacingMultiplier="1.1"
             android:layout_weight="9"
             android:padding="10dp"
-            android:text="ABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABCABC"
+            android:text="Sample Content"
             android:textColor="#E39F93"
             android:textSize="26sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#f6f6f6" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="Chapter Names will be displayed here"
+            android:linksClickable="true"
+            android:autoLink="web" />
 
         <Button
             android:id="@+id/btn_read"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="viewChapter" />
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="View Chapters" />
         <Button
             android:id="@+id/btn_detail"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="viewDetail" />
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="View Choices" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

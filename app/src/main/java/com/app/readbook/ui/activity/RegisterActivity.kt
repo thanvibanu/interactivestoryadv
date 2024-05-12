@@ -2,22 +2,26 @@ package com.app.readbook.ui.activity
 
 import android.util.Log
 import android.view.View
+import com.app.readbook.App
+import com.app.readbook.MainActivity
 import com.app.readbook.base.BaseMvvmActivity
 import com.app.readbook.data.User
 import com.app.readbook.databinding.ActivityRegisterBinding
 import com.app.readbook.viewmodel.RegisterViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : BaseMvvmActivity<ActivityRegisterBinding, RegisterViewModel>() {
+    private val tagname = RegisterActivity::class.simpleName
+
+
     override fun initData() {
         binding.registerButton.setOnClickListener(View.OnClickListener {
-            val tagname = RegisterActivity::class.simpleName
-            val account = binding.emailEditText.text.toString()
-            val password = binding.nameEditText.text.toString()
-            val rePassword = binding.passwordEditText.text.toString()
-            val name = binding.nameEditText.text.toString()
             Log.d(tagname, "Inside initData()")
-            Log.d(tagname, "${account} + ${password} + ${rePassword} + ${name}")
+
+            val account = binding.emailEditText.text.toString()
+            val password = binding.passwordEditText.text.toString()
+            val rePassword = binding.confirmPasswordEditText.text.toString()
+            val name = binding.nameEditText.text.toString()
+
             if (account.isEmpty()) {
                 toast("Please enter the email")
                 return@OnClickListener
@@ -38,35 +42,34 @@ class RegisterActivity : BaseMvvmActivity<ActivityRegisterBinding, RegisterViewM
                 toast("The two passwords are inconsistent")
                 return@OnClickListener
             }
-            FirebaseFirestore.getInstance().collection("User").whereEqualTo("email", account)
-                .get().addOnSuccessListener { queryDocumentSnapshots ->
-                    val users = queryDocumentSnapshots.toObjects(
-                        User::class.java
-                    )
-                    if (users.isEmpty()) {
-                        val user = User()
-                        user.email = account
-                        user.password = password
-                        user.type = binding.typeSpinner.selectedItem.toString()
-                        user.name = name
-                        user.id = System.currentTimeMillis().toString()
-                        user.addTime = System.currentTimeMillis().toString()
-                        FirebaseFirestore.getInstance().collection("User").add(user)
-                            .addOnSuccessListener {
-                                toast("Registration successful")
-                                finish()
-                            }
 
-                    } else {
-                        toast("Account already exists")
+            val user = User()
+            user.email = account
+            user.password = password
+            user.type = binding.typeSpinner.selectedItem.toString()
+            user.name = name
+            user.id = System.currentTimeMillis().toString()
+            user.addTime = System.currentTimeMillis().toString()
+
+            auth.createUserWithEmailAndPassword(user.email, user.password)
+                .addOnSuccessListener {
+                    Log.d(tagname, "Inside createUserInFirebase addOnSuccessListener()")
+
+                    db.collection("User").add(user).addOnSuccessListener {
+                        toast("Registration successful")
+                        startActivity(MainActivity::class.java)
+                        App.login(user)
+                        finish()
+                        toast("Login succeeded")
                     }
 
-                }.addOnFailureListener {
-                    toast("Registration failed")
+                }
+                .addOnFailureListener {
+                    Log.d(tagname, "Inside createUserInFirebase addOnFailureListener()")
+                    Log.d(tagname, "Error message: ${it.message}")
+                    toast("Registration failed. ${it.message}")
                 }
 
         })
-
-
     }
 }

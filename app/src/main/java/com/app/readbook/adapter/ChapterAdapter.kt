@@ -14,7 +14,7 @@ class ChapterAdapter(val onChapterClickListener: (Chapter, Int) -> Unit) :
     }
 
     @SuppressLint("SetTextI18n")
-    override fun bind(vb: ItemChapterBinding, data: Chapter, position: Int) {
+    override fun bind(vb: ItemChapterBinding, data: Chapter, position: Int, dataList: List<Chapter>) {
         vb.apply {
             root.text = "Chapter ${position + 1} ${data.title}"
             root.setOnClickListener {
